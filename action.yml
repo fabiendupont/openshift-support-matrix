@@ -1,0 +1,29 @@
+---
+name: 'Red Hat OpenShift Container Platform Support Matrix'
+description: 'Dynamically retrieve currently supported OCP versions and extended release metadata for CI matrix strategies'
+author: 'Fabien Dupont'
+inputs:
+  include_eus_only:
+    description: 'Only return versions currently in Extended Update Support'
+    required: false
+    default: 'false'
+  min_version:
+    description: 'Exclude versions older than this (e.g. 4.14)'
+    required: false
+    default: '4.14'
+  arch:
+    description: 'Architecture filter (x86_64, aarch64, s390x, ppc64le)'
+    required: false
+    default: 'x86_64'
+outputs:
+  matrix:
+    description: 'JSON array of supported OCP minor versions, e.g. ["4.18","4.19","4.20"]'
+  latest:
+    description: 'The most recent GA version string'
+  eus:
+    description: 'JSON array of versions currently in Extended Update Support'
+  versions:
+    description: 'JSON object with extended metadata per version (payload, kubernetes, rhcos, kernel)'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
