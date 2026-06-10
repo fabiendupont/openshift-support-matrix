@@ -1,0 +1,56 @@
+---
+name: 'Build & Test'
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run format-check
+      - run: npm run lint
+      - run: npm test
+      - run: npm audit --audit-level=high
+      - run: npm run package
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+      - uses: ./
+        id: ocp
+      - name: Validate outputs
+        run: |
+          echo "matrix=${{ steps.ocp.outputs.matrix }}"
+          echo "latest=${{ steps.ocp.outputs.latest }}"
+          echo "eus=${{ steps.ocp.outputs.eus }}"
+
+          # Validate matrix is a non-empty JSON array
+          echo '${{ steps.ocp.outputs.matrix }}' | jq -e 'type == "array" and length > 0'
+
+          # Validate latest is a version string
+          echo '${{ steps.ocp.outputs.latest }}' | grep -qE '^4\.[0-9]+'
+
+          # Validate eus is a JSON array
+          echo '${{ steps.ocp.outputs.eus }}' | jq -e 'type == "array"'
+
+          # Validate versions is a non-empty JSON object
+          echo '${{ steps.ocp.outputs.versions }}' | jq -e 'type == "object" and length > 0'
+
+          # Validate each version entry has expected fields
+          echo '${{ steps.ocp.outputs.versions }}' | jq -e 'to_entries | .[0].value | has("payload", "kubernetes", "rhcos")'
