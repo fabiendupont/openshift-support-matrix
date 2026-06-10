@@ -26,7 +26,7 @@
   "author": "Fabien Dupont",
   "license": "Apache-2.0",
   "dependencies": {
-    "@actions/core": "^1.11.1"
+    "@actions/core": "^3.0.1"
   },
   "overrides": {
     "undici": "^7.10.0"
