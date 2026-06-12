@@ -29,6 +29,13 @@ export default [
     }
   },
   {
+    files: ['src/cli.ts'],
+    rules: {
+      'no-console': 'off',
+      'github/no-then': 'off',
+    }
+  },
+  {
     files: ['**/*.test.ts'],
     plugins: {jest},
     languageOptions: {

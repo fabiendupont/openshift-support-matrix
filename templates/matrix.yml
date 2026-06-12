@@ -1,0 +1,41 @@
+spec:
+  inputs:
+    min_version:
+      description: "Minimum OCP version to include"
+      default: "4.14"
+    arch:
+      description: "Architecture: x86_64, aarch64, s390x, ppc64le"
+      default: "x86_64"
+    include_eus_only:
+      description: "Only return EUS versions"
+      default: "false"
+    stage:
+      description: "Pipeline stage for the job"
+      default: ".pre"
+---
+
+ocp-support-matrix:
+  stage: $[[ inputs.stage ]]
+  image: node:22-alpine
+  variables:
+    npm_config_cache: .npm
+  cache:
+    key: ocp-support-matrix
+    paths:
+      - .npm/
+  script:
+    - |
+      ARGS="--min-version $[[ inputs.min_version ]] --arch $[[ inputs.arch ]]"
+      if [ "$[[ inputs.include_eus_only ]]" = "true" ]; then
+        ARGS="${ARGS} --eus-only"
+      fi
+      npx --yes openshift-support-matrix ${ARGS} > ocp-matrix.json
+    - echo "OCP_MATRIX=$(cat ocp-matrix.json | jq -c '.matrix')" >> matrix.env
+    - echo "OCP_LATEST=$(cat ocp-matrix.json | jq -r '.latest')" >> matrix.env
+    - echo "OCP_EUS=$(cat ocp-matrix.json | jq -c '.eus')" >> matrix.env
+    - cat ocp-matrix.json | jq .
+  artifacts:
+    paths:
+      - ocp-matrix.json
+    reports:
+      dotenv: matrix.env

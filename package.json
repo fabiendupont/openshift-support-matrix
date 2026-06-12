@@ -1,15 +1,20 @@
 {
   "name": "openshift-support-matrix",
   "version": "0.1.0",
-  "private": true,
-  "description": "GitHub Action to retrieve supported Red Hat OpenShift Container Platform versions",
-  "main": "lib/main.js",
+  "description": "Retrieve supported Red Hat OpenShift Container Platform versions with extended metadata",
+  "main": "lib/core.js",
+  "bin": {
+    "openshift-support-matrix": "dist/cli/index.js"
+  },
+  "files": [
+    "dist/cli/"
+  ],
   "scripts": {
     "build": "tsc",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
-    "package": "ncc build --source-map --license licenses.txt",
+    "package": "ncc build lib/action.js -o dist/action --source-map --license licenses.txt && ncc build lib/cli.js -o dist/cli --source-map",
     "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
@@ -18,10 +23,12 @@
     "url": "git+https://github.com/fabiendupont/openshift-support-matrix.git"
   },
   "keywords": [
-    "actions",
     "openshift",
+    "ocp",
     "matrix",
-    "ci"
+    "ci",
+    "github-actions",
+    "gitlab-ci"
   ],
   "author": "Fabien Dupont",
   "license": "Apache-2.0",

@@ -26,4 +26,4 @@ outputs:
     description: 'JSON object with extended metadata per version (payload, kubernetes, rhcos, kernel)'
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'dist/action/index.js'
